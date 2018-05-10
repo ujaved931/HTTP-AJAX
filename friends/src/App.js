@@ -1,21 +1,73 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
 import './App.css';
+import axios from 'axios';
+import FriendsList from './components/FriendsList.js';
 
 class App extends Component {
+  constructor() {
+    super();
+    this.state = {
+      friends: [],
+      name: '',
+      age: '',
+      email: '',
+    }
+  }
+
+  handleOnChange = event => {
+    this.setState({ [event.target.name]: event.target.value })
+
+    const friendNew = {
+      name: this.state.name,
+      age: this.state.age,
+      email: this.state.email
+    };
+
+    axios.post('http://localhost:5000/friends', friendNew)
+      .then(response  => {
+        this.setState({ friends: response.data, name: '', age: '', email: '' });
+      });
+  }
+  componentDidMount() {
+    axios.get('http://localhost:5000/friends')
+      .then(response => this.setState({ friends: response.data }))
+  }
+
+
+
   render() {
     return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h1 className="App-title">Welcome to React</h1>
-        </header>
-        <p className="App-intro">
-          To get started, edit <code>src/App.js</code> and save to reload.
-        </p>
-      </div>
-    );
-  }
-}
+      <div>
+        <FriendsList friends={this.state.friends} />
+        <form>
+          <input
+            name='name'
+            type='text'
+            placeholder='Name'
+            value={this.state.name}
+            onChange={this.handleOnChange}
+            />
+          <input  
+          name='age'
+          type='text'
+          placeholder='Age'
+          value={this.state.age}
+          onChange={this.handleOnChange}
+            />
+          <input 
+            name='email'
+            type='text'
+            placeholder='Email'
+            value={this.state.email}
+            onChange={this.handleOnChange}
+            />
 
-export default App;
+            <button onClick= {this.saveFriend}>add</button>
+
+            </form>
+      </div>
+        );
+      }
+    }
+    
+    export default App;
